@@ -5,6 +5,16 @@ const editor = grapesjs.init({
     fromElement: false,
     storageManager: false,
 
+    // canvas: {
+    //     styles: [
+    //         "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css",
+    //     ],
+    //     scripts: [
+    //         "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js",
+    //         "/js/custom.js",
+    //     ],
+    // },
+
     plugins: [
         "gjs-preset-webpage",
         "gjs-blocks-basic",
