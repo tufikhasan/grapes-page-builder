@@ -85,24 +85,21 @@
                 "/js/custom.js",
             ];
 
-            // Wait a short time to ensure iframe is ready
-            setTimeout(() => {
-                // Add CSS links
-                styles.forEach((href) => {
-                    const link = document.createElement("link");
-                    link.rel = "stylesheet";
-                    link.href = href;
-                    iframeDoc.head.appendChild(link);
-                });
+            // Add CSS links
+            styles.forEach((href) => {
+                const link = document.createElement("link");
+                link.rel = "stylesheet";
+                link.href = href;
+                iframeDoc.head.appendChild(link);
+            });
 
-                // Add JS scripts
-                scripts.forEach((src) => {
-                    const script = document.createElement("script");
-                    script.src = src; // ✅ corrected
-                    script.type = "text/javascript";
-                    iframeDoc.body.appendChild(script);
-                });
-            }, 200); // slight delay to ensure iframe is fully built
+            // Add JS scripts
+            scripts.forEach((src) => {
+                const script = document.createElement("script");
+                script.src = src; // ✅ corrected
+                script.type = "text/javascript";
+                iframeDoc.body.appendChild(script);
+            });
         });
     </script>
 
