@@ -20,11 +20,10 @@ const editor = grapesjs.init({
         "gjs-blocks-basic",
         "grapesjs-component-code-editor",
     ],
-
     pluginsOpts: {
-        "gjs-blocks-basic": {},
-        "grapesjs-component-code-editor": {},
-    },
+      'gjs-blocks-basic': {},
+      "grapesjs-component-code-editor": {},
+    }
 });
 /********************************
  * body content format method
@@ -127,7 +126,7 @@ editor.DomComponents.addType("category-component", {
             components: `
                     <section>
                         <h2>Swiper Slider</h2>
-                        <div>
+                        <div class="row">
                             <!-- DYNAMIC_PART_START:components.category -->
                             <div class="swiper">
                                 <div class="swiper-wrapper">
@@ -208,3 +207,89 @@ editor.BlockManager.add("category-section", {
     },
     media: `<i class="fas fa-th-large"></i>`,
 });
+// table-component
+editor.DomComponents.addType("table-component", {
+  model: {
+    defaults: {
+      name: "Table",
+      droppable: false,
+      draggable: true,
+      selectable: true,
+      highlightable: true,
+      components: [
+        {
+          tagName: "table",
+          classes: ["table", "w-full", "border"],
+          components: [
+            {
+              tagName: "thead",
+              components: [
+                {
+                  tagName: "tr",
+                  selectable: true,
+                  components: [
+                    {
+                      tagName: "th",
+                      components: [{ type: "text", content: "#" }],
+                    },
+                    {
+                      tagName: "th",
+                      components: [{ type: "text", content: "First" }],
+                    },
+                    {
+                      tagName: "th",
+                      components: [{ type: "text", content: "Last" }],
+                    },
+                    {
+                      tagName: "th",
+                      components: [{ type: "text", content: "Handle" }],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              tagName: "tbody",
+              components: [
+                {
+                  tagName: "tr",
+                  selectable: true,
+                  components: [
+                    {
+                      tagName: "th",
+                      attributes: { scope: "row" },
+                      components: [{ type: "text", content: "1" }],
+                    },
+                    {
+                      tagName: "td",
+                      components: [{ type: "text", content: "Mark" }],
+                    },
+                    {
+                      tagName: "td",
+                      components: [{ type: "text", content: "Otto" }],
+                    },
+                    {
+                      tagName: "td",
+                      components: [{ type: "text", content: "@mdo" }],
+                    },
+                  ],
+                },
+                // Add more <tr> like above
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+});
+
+editor.BlockManager.add("table-section", {
+    label: "Table",
+    category: "Sections",
+    content: {
+        type: "table-component",
+    },
+    media: `<i class="fas fa-list"></i>`,
+});
+
