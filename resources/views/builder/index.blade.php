@@ -8,9 +8,9 @@
     <title>{{ $page?->title }}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap.min.css">
-    <style>
-        {!! $page->css !!}
-    </style>
+    @if ($page->css)
+        <style>{!! $page->css !!}</style>
+    @endif
 </head>
 
 <body>
@@ -18,11 +18,13 @@
     {{-- {!! $page->html !!} --}}
     {!! $renderedContent !!}
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            {!! $page->js !!}
-        });
-    </script>
+    @if ($page->js)
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                {!! $page->js !!}
+            });
+        </script>
+    @endif
 </body>
 
 </html>

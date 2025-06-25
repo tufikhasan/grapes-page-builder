@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 
@@ -11,7 +10,7 @@ class PageController extends Controller {
     public function index($slug) {
         $page = Page::whereSlug($slug)->firstOrFail();
         $renderedContent = Blade::render($page->content);
-        return view('builder.index', compact('page','renderedContent'));
+        return view('builder.index', compact('page', 'renderedContent'));
     }
     public function create() {
         return view('builder.create');
@@ -40,11 +39,19 @@ class PageController extends Controller {
         $page = Page::findOrFail($id);
 
         $page->update([
-            'html'    => $request->input('html'),
-            'css'     => $request->input('css'),
-            'js'      => $request->input('js'),
-            'json'    => $request->input('json'),
-            'content' => $request->input('content'),
+            'html'    => null,
+            'css'     => null,
+            'js'      => null,
+            'json'    => null,
+            'content' => null,
+        ]);
+
+        $page->update([
+            'html'    => $request->input('html',null),
+            'css'     => $request->input('css',null),
+            'js'      => $request->input('js',null),
+            'json'    => $request->input('json',null),
+            'content' => $request->input('content',null),
         ]);
 
         return response()->json(['status' => 'success']);
