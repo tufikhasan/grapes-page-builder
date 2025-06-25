@@ -1,6 +1,10 @@
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
-const pageId = document.getElementById('page_id').value;
+const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
+const baseUrl = document
+    .querySelector('meta[name="base-url"]')
+    .getAttribute("content");
+const pageId = document.getElementById("page_id").value;
 
 /********************************
  * editor initialize
@@ -60,9 +64,9 @@ editor.Panels.addButton("options", [
     },
 ]);
 // Command
-editor.Commands.add('save-page', {
+editor.Commands.add("save-page", {
     async run(editor, sender) {
-        sender && sender.set('active', false);
+        sender && sender.set("active", false);
 
         const html = editor.getHtml();
         const css = editor.getCss();
@@ -72,10 +76,10 @@ editor.Commands.add('save-page', {
 
         try {
             const res = await fetch(`${baseUrl}/builder/${pageId}`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
                 },
                 body: JSON.stringify({
                     html,
@@ -83,17 +87,16 @@ editor.Commands.add('save-page', {
                     js,
                     json,
                     content,
-                })
+                }),
             });
 
             const data = await res.json();
             showToast("Page saved successfully!", "success");
-
         } catch (e) {
             console.error(e);
             showToast("Failed to save page.", "error");
         }
-    }
+    },
 });
 // toast
 function showToast(message, type) {
@@ -117,46 +120,49 @@ function showToast(message, type) {
 /********************************
  * Sections
  ********************************/
+// category-component
 editor.DomComponents.addType("category-component", {
     model: {
         defaults: {
             components: `
                     <section>
                         <h2>Swiper Slider</h2>
-                        <!-- DYNAMIC_PART_START:components.category -->
-                        <div class="swiper">
-                            <div class="swiper-wrapper">
-                                    <div class="swiper-slide">
-                                        <span>Item 01</span>
-                                    </div>
-                                    <div class="swiper-slide">
-                                        <span>Item 02</span>
-                                    </div>
-                                    <div class="swiper-slide">
-                                        <span>Item 03</span>
-                                    </div>
-                                    <div class="swiper-slide">
-                                        <span>Item 04</span>
-                                    </div>
-                            </div>
-                        </div>
                         <div>
-                            <button class="button-prev">
-                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15 7L1 7M1 7L7 1M1 7L7 13" stroke="#161439" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
-                            <button class="button-next">
-                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M1 7L15 7M15 7L9 1M15 7L9 13" stroke="#161439" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+                            <!-- DYNAMIC_PART_START:components.category -->
+                            <div class="swiper">
+                                <div class="swiper-wrapper">
+                                        <div class="swiper-slide">
+                                            <span>Item 01</span>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <span>Item 02</span>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <span>Item 03</span>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <span>Item 04</span>
+                                        </div>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="button-prev">
+                                    <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15 7L1 7M1 7L7 1M1 7L7 13" stroke="#161439" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                                <button class="button-next">
+                                    <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 7L15 7M15 7L9 1M15 7L9 13" stroke="#161439" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- DYNAMIC_PART_END -->
                         </div>
-                        <!-- DYNAMIC_PART_END -->
                     </section>`,
             script: function () {
                 var categoriesSwiper = new Swiper(".swiper", {
