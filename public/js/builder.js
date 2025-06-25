@@ -1,3 +1,10 @@
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+const pageId = document.getElementById('page_id').value;
+
+/********************************
+ * editor initialize
+ ********************************/
 const editor = grapesjs.init({
     container: "#gjs",
     height: "100vh",
@@ -15,6 +22,9 @@ const editor = grapesjs.init({
         "grapesjs-component-code-editor": {},
     },
 });
+/********************************
+ * body content format method
+ ********************************/
 function updateEditorParts(html) {
     // Remove <body> and </body> tags
     html = html
@@ -49,6 +59,42 @@ editor.Panels.addButton("options", [
         },
     },
 ]);
+// Command
+editor.Commands.add('save-page', {
+    async run(editor, sender) {
+        sender && sender.set('active', false);
+
+        const html = editor.getHtml();
+        const css = editor.getCss();
+        const js = editor.getJs();
+        const json = JSON.stringify(editor.getProjectData());
+        const content = updateEditorParts(html);
+
+        try {
+            const res = await fetch(`${baseUrl}/builder/${pageId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    html,
+                    css,
+                    js,
+                    json,
+                    content,
+                })
+            });
+
+            const data = await res.json();
+            showToast("Page saved successfully!", "success");
+
+        } catch (e) {
+            console.error(e);
+            showToast("Failed to save page.", "error");
+        }
+    }
+});
 // toast
 function showToast(message, type) {
     const toast = document.createElement("div");
@@ -68,7 +114,6 @@ function showToast(message, type) {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
-
 /********************************
  * Sections
  ********************************/
@@ -149,7 +194,6 @@ editor.DomComponents.addType("category-component", {
         },
     },
 });
-
 editor.BlockManager.add("category-section", {
     label: "Category Section",
     category: "Sections",

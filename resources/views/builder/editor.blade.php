@@ -3,6 +3,8 @@
 
 <head>
     <title>Editor - {{ $page->title }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
     <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
     <link href="https://unpkg.com/grapesjs-component-code-editor/dist/grapesjs-component-code-editor.min.css"
         rel="stylesheet">
@@ -19,6 +21,7 @@
 
 <body>
     <div id="gjs" style="height:100vh;"></div>
+    <input type="hidden" id="page_id" value="{{$page->id}}">
 
     <script src="https://unpkg.com/grapesjs"></script>
     <script src="https://unpkg.com/grapesjs-preset-webpage"></script>
@@ -27,44 +30,6 @@
     <script src="{{ asset('js/builder.js') }}"></script>
 
     <script>
-        // ✅ Save Command
-        editor.Commands.add('save-page', {
-            async run(editor, sender) {
-                sender && sender.set('active', false);
-
-                const html = editor.getHtml();
-                const css = editor.getCss();
-                const js = editor.getJs();
-                const json = JSON.stringify(editor.getProjectData());
-                const content = updateEditorParts(html);
-
-                try {
-                    const res = await fetch('{{ route('builder.save', $page->id) }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            html,
-                            css,
-                            js,
-                            json,
-                            content,
-                        })
-                    });
-
-                    const data = await res.json();
-                    showToast("Page saved successfully!", "success");
-
-                } catch (e) {
-                    console.error(e);
-                    showToast("Failed to save page.", "error");
-                }
-            }
-        });
-
-
         // Inject Bootstrap CSS and Font Awesome into the canvas
         editor.on("load", () => {
             // Load project data before manipulating iframe
