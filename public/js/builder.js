@@ -2,19 +2,8 @@ const editor = grapesjs.init({
     container: "#gjs",
     height: "100vh",
     width: "auto",
-    fromElement: false,
+    fromElement: true,
     storageManager: false,
-
-    // canvas: {
-    //     styles: [
-    //         "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css",
-    //     ],
-    //     scripts: [
-    //         "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js",
-    //         "/js/custom.js",
-    //     ],
-    // },
-
     plugins: [
         "gjs-preset-webpage",
         "gjs-blocks-basic",
@@ -32,6 +21,9 @@ function updateEditorParts(html) {
         .replace(/<\s*body[^>]*>/gi, "")
         .replace(/<\s*\/\s*body\s*>/gi, "");
 
+    // Remove all <script>...</script> tags including multiline and inline
+    html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+
     // Replace dynamic parts with Blade @include directive
     html = html.replace(
         /<!--\s*DYNAMIC_PART_START:(.*?)\s*-->([\s\S]*?)<!--\s*DYNAMIC_PART_END\s*-->/g,
@@ -43,3 +35,126 @@ function updateEditorParts(html) {
 
     return html;
 }
+/********************************
+ * Save Button
+ ********************************/
+// Button
+editor.Panels.addButton("options", [
+    {
+        id: "save-page",
+        className: "fa fa-floppy-o",
+        command: "save-page",
+        attributes: {
+            title: "Save Page",
+        },
+    },
+]);
+// toast
+function showToast(message, type) {
+    const toast = document.createElement("div");
+    toast.innerText = message;
+    toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === "success" ? "#22c55e" : "#ef4444"};
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 9999;
+                font-family: sans-serif;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+/********************************
+ * Sections
+ ********************************/
+editor.DomComponents.addType("category-component", {
+    model: {
+        defaults: {
+            components: `
+                    <section>
+                        <h2>Swiper Slider</h2>
+                        <!-- DYNAMIC_PART_START:components.category -->
+                        <div class="swiper">
+                            <div class="swiper-wrapper">
+                                    <div class="swiper-slide">
+                                        <span>Item 01</span>
+                                    </div>
+                                    <div class="swiper-slide">
+                                        <span>Item 02</span>
+                                    </div>
+                                    <div class="swiper-slide">
+                                        <span>Item 03</span>
+                                    </div>
+                                    <div class="swiper-slide">
+                                        <span>Item 04</span>
+                                    </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="button-prev">
+                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15 7L1 7M1 7L7 1M1 7L7 13" stroke="#161439" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                            <button class="button-next">
+                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 7L15 7M15 7L9 1M15 7L9 13" stroke="#161439" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- DYNAMIC_PART_END -->
+                    </section>`,
+            script: function () {
+                var categoriesSwiper = new Swiper(".swiper", {
+                    // Optional parameters
+                    slidesPerView: 1,
+                    loop: true,
+                    // Navigation arrows
+                    navigation: {
+                        nextEl: ".button-next",
+                        prevEl: ".button-prev",
+                    },
+                });
+            },
+        },
+        init() {
+            const wrapper = this;
+            const disableEditExcept = (comp, isRoot = false) => {
+                const tag = comp.get("tagName")?.toUpperCase();
+                const isAllowed = ["H5", "H2"].includes(tag);
+
+                comp.set({
+                    editable: isAllowed,
+                    draggable: !isRoot, // ❗ allow root to be draggable
+                    droppable: false,
+                    copyable: false,
+                    selectable: isAllowed || isRoot, // allow root to be selectable
+                });
+
+                comp.components().forEach((child) =>
+                    disableEditExcept(child, false)
+                );
+            };
+
+            disableEditExcept(wrapper, true); // Pass `true` for root
+        },
+    },
+});
+
+editor.BlockManager.add("category-section", {
+    label: "Category Section",
+    category: "Sections",
+    content: {
+        type: "category-component",
+    },
+    media: `<i class="fas fa-th-large"></i>`,
+});

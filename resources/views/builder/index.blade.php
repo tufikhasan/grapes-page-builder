@@ -13,11 +13,10 @@
 </head>
 
 <body>
-    {{-- @dd($page)
-    {!! $page->page !!} --}}
+    {{-- @dd($page) --}}
+    {{-- {!! $page->html !!} --}}
     {!! $renderedContent !!}
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-    <script src="{{ asset('js/custom.js') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             {!! $page->js !!}

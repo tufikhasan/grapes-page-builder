@@ -27,90 +27,6 @@
     <script src="{{ asset('js/builder.js') }}"></script>
 
     <script>
-        editor.DomComponents.addType('category-component', {
-            model: {
-                defaults: {
-                    components: `
-                    <section>
-                        <h2>Swiper Slider</h2>
-                        <!-- DYNAMIC_PART_START:components.category -->
-                        <div class="swiper categories-active">
-                            <div class="swiper-wrapper">
-                                    <div class="swiper-slide">
-                                        <span>Item 01</span>
-                                    </div>
-                                    <div class="swiper-slide">
-                                        <span>Item 02</span>
-                                    </div>
-                                    <div class="swiper-slide">
-                                        <span>Item 03</span>
-                                    </div>
-                                    <div class="swiper-slide">
-                                        <span>Item 04</span>
-                                    </div>
-                            </div>
-                        </div>
-                        <div>
-                            <button class="categories-button-prev">
-                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15 7L1 7M1 7L7 1M1 7L7 13" stroke="#161439" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
-                            <button class="categories-button-next">
-                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M1 7L15 7M15 7L9 1M15 7L9 13" stroke="#161439" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
-                        </div>
-                        <!-- DYNAMIC_PART_END -->
-                    </section>`,
-                },
-                init() {
-                    const wrapper = this;
-
-                    // Recursive function to disable editable except for h5 and h2
-                    const disableEditExcept = (comp) => {
-                        const tag = comp.get('tagName')?.toUpperCase();
-                        const isAllowed = ['H5', 'H2'].includes(tag);
-                        comp.set({
-                            editable: isAllowed,
-                            draggable: false,
-                            droppable: false,
-                            copyable: false,
-                            selectable: isAllowed,
-                        });
-
-                        comp.components().forEach(child => disableEditExcept(child));
-                    };
-
-                    // Start from this component
-                    disableEditExcept(wrapper);
-                }
-            },
-        });
-
-        editor.BlockManager.add('category-section', {
-            label: 'Category Section',
-            category: 'Sections',
-            content: {
-                type: 'category-component'
-            },
-            media: `<i class="fas fa-th-large"></i>`,
-        });
-        // ✅ Save Button
-        editor.Panels.addButton('options', [{
-            id: 'save-page',
-            className: 'fa fa-floppy-o',
-            command: 'save-page',
-            attributes: {
-                title: 'Save Page'
-            }
-        }]);
-
         // ✅ Save Command
         editor.Commands.add('save-page', {
             async run(editor, sender) {
@@ -148,30 +64,12 @@
             }
         });
 
-        function showToast(message, type) {
-            const toast = document.createElement('div');
-            toast.innerText = message;
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#22c55e' : '#ef4444'};
-                color: white;
-                padding: 10px 20px;
-                border-radius: 5px;
-                z-index: 9999;
-                font-family: sans-serif;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
 
         // Inject Bootstrap CSS and Font Awesome into the canvas
         editor.on("load", () => {
             // Load project data before manipulating iframe
             @if ($page->json)
-                editor.loadProjectData({!! json_encode(json_decode($page->json)) !!});
+                editor.loadProjectData({!! json_encode(json_decode($page->json))!!});
             @endif
 
             const iframe = editor.Canvas.getFrameEl();
