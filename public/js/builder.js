@@ -20,8 +20,6 @@ const editor = grapesjs.init({
         "grapesjs-component-code-editor": {},
     },
 });
-// Example usage inside your main script
-loadComponentModules(editor);
 /********************************
  * Save Button
  ********************************/
@@ -123,10 +121,19 @@ function updateEditorParts(html) {
                 });
 
             // Convert params object to PHP array string for blade
-            const bladeParams = Object.entries(params).map(([k, v]) => `'${k}' => '${v}'`).join(", ");
+            const bladeParams = Object.entries(params)
+                .map(([k, v]) => `'${k}' => '${v}'`)
+                .join(", ");
             // include dynamic path and check params exist or not
-            const includePart = bladeParams.length > 0 ? `@include('${trimmedPath}', [${bladeParams}])` : `@include('${trimmedPath}')`;
-            return `<!-- ${capitalizeWords(trimmedPath + " Start" )} -->\n${includePart}\n<!-- ${capitalizeWords(trimmedPath + " End")} -->`;
+            const includePart =
+                bladeParams.length > 0
+                    ? `@include('${trimmedPath}', [${bladeParams}])`
+                    : `@include('${trimmedPath}')`;
+            return `<!-- ${capitalizeWords(
+                trimmedPath + " Start"
+            )} -->\n${includePart}\n<!-- ${capitalizeWords(
+                trimmedPath + " End"
+            )} -->`;
         }
     );
 
@@ -173,10 +180,15 @@ const scripts = [
     "/js/custom.js",
 ];
 // Inject Bootstrap CSS and Font Awesome into the canvas
-editor.on("load", () => {
+editor.on("load", async () => {
+    // Step 1: Load dynamic blocks/components FIRST
+    await loadComponentModules(editor);
+
+    // Step 2: Then load the saved project JSON
     if (window.pageJson) {
         editor.loadProjectData(window.pageJson);
     }
+    // Step 3: Inject styles
     const iframe = editor.Canvas.getFrameEl();
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     // Add CSS links
@@ -200,22 +212,17 @@ editor.on("load", () => {
  ********************************/
 async function loadComponentModules(editor) {
     try {
-        const res = await fetch("/component-files");
-        const componentFiles = await res.json();
-
-        for (const file of componentFiles) {
-            if (!file || typeof file !== "string") continue; // Skip empty or invalid entries
-
-            try {
-                const module = await import(file);
-                if (typeof module.default === "function") {
-                    module.default(editor);
+        for (const file of window.builderComponentsFiles) {
+            if (typeof file === "string" && file.endsWith(".js")) {
+                try {
+                    const module = await import(file);
+                    module.default?.(editor);
+                } catch (err) {
+                    console.error(`❌ Failed to load module: ${file}`, err);
                 }
-            } catch (err) {
-                console.error(`❌ Failed to load: ${file}`, err);
             }
         }
     } catch (e) {
-        console.error("❌ Failed to fetch component files", e);
+        console.error("❌ Error in loadComponentModules:", e);
     }
 }
