@@ -23,6 +23,29 @@ const editor = grapesjs.init({
 /********************************
  * body content format method
  ********************************/
+// function updateEditorParts(html) {
+//     // Remove <body> and </body> tags
+//     html = html
+//         .replace(/<\s*body[^>]*>/gi, "")
+//         .replace(/<\s*\/\s*body\s*>/gi, "");
+
+//     // Remove all <script>...</script> tags including multiline and inline
+//     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+
+//     // Replace dynamic parts with Blade @include directive
+//     html = html.replace(
+//         /<!--\s*DYNAMIC_PART_START:(.*?)\s*-->([\s\S]*?)<!--\s*DYNAMIC_PART_END\s*-->/g,
+//         (match, path) => {
+//             const trimmedPath = path.trim();
+//             return `<!-- DYNAMIC_PART_START:${trimmedPath} -->\n@include('${trimmedPath}')\n<!-- DYNAMIC_PART_END -->`;
+//         }
+//     );
+
+//     return html;
+// }
+/********************************
+ * body content format method with params
+ ********************************/
 function updateEditorParts(html) {
     // Remove <body> and </body> tags
     html = html
@@ -34,14 +57,39 @@ function updateEditorParts(html) {
 
     // Replace dynamic parts with Blade @include directive
     html = html.replace(
-        /<!--\s*DYNAMIC_PART_START:(.*?)\s*-->([\s\S]*?)<!--\s*DYNAMIC_PART_END\s*-->/g,
-        (match, path) => {
+        /<!--\s*DYNAMIC_PART_START:(\S+)([^>]*)-->([\s\S]*?)<!--\s*DYNAMIC_PART_END\s*-->/g,
+        (match, path, paramsString) => {
             const trimmedPath = path.trim();
-            return `<!-- DYNAMIC_PART_START:${trimmedPath} -->\n@include('${trimmedPath}')\n<!-- DYNAMIC_PART_END -->`;
+
+            // Parse params string like ' count=4 filter=latest userId=123'
+            const params = {};
+            paramsString
+                .trim()
+                .split(/\s+/)
+                .forEach((pair) => {
+                    if (!pair) return;
+                    const [key, val] = pair.split("=");
+                    if (key && val !== undefined) {
+                        params[key] = val.replace(/^["']|["']$/g, ""); // remove quotes if any
+                    }
+                });
+
+            // Convert params object to PHP array string for blade
+            const bladeParams = Object.entries(params).map(([k, v]) => `'${k}' => '${v}'`).join(", ");
+            // include dynamic path and check params exist or not
+            const includePart = bladeParams.length > 0 ? `@include('${trimmedPath}', [${bladeParams}])` : `@include('${trimmedPath}')`;
+            return `<!-- ${capitalizeWords(trimmedPath + " Start" )} -->\n${includePart}\n<!-- ${capitalizeWords(trimmedPath + " End")} -->`;
         }
     );
 
     return html;
+}
+function capitalizeWords(str) {
+    return str
+        .split(/[_\-.,]/) // escape dash for clarity
+        .filter(Boolean) // remove empty strings from split results
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 }
 /********************************
  * Save Button
@@ -159,7 +207,7 @@ editor.DomComponents.addType("category-component", {
                     <section>
                         <h2>Swiper Slider</h2>
                         <div class="row">
-                            <!-- DYNAMIC_PART_START:components.category -->
+                            <!-- DYNAMIC_PART_START:components.category count=4 filter=latest userId=123 -->
                             <div class="swiper">
                                 <div class="swiper-wrapper">
                                         <div class="swiper-slide">
