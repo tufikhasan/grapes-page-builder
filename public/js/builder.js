@@ -43,6 +43,7 @@ const editor = grapesjs.init({
 
 //     return html;
 // }
+
 /********************************
  * body content format method with params
  ********************************/
