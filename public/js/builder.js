@@ -69,6 +69,55 @@ editor.Commands.add("save-page", {
         }
     },
 });
+/*** body content format method with params component load ***/
+// function updateEditorParts(html) {
+//     // Remove <body> tags
+//     html = html
+//         .replace(/<\s*body[^>]*>/gi, "")
+//         .replace(/<\s*\/\s*body\s*>/gi, "");
+
+//     // Remove all <script> tags (including multiline)
+//     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+
+//     // Replace dynamic parts with Blade <x-component /> directive
+//     html = html.replace(
+//         /<!--\s*DYNAMIC_PART_START:([\S]+)([^>]*)-->([\s\S]*?)<!--\s*DYNAMIC_PART_END\s*-->/g,
+//         (match, path, paramsString) => {
+//             const trimmedPath = path.trim();
+
+//             // Parse key=value pairs into object
+//             const params = {};
+//             paramsString
+//                 .trim()
+//                 .split(/\s+/)
+//                 .forEach((pair) => {
+//                     if (!pair) return;
+//                     const [key, val] = pair.split("=");
+//                     if (key && val !== undefined) {
+//                         params[key] = val.replace(/^["']|["']$/g, ""); // strip quotes
+//                     }
+//                 });
+
+//             // Convert to Blade-style props
+//             const props = Object.entries(params)
+//                 .map(([key, val]) => `${key}="${val}"`)
+//                 .join(" ");
+
+//             const componentTag =
+//                 props.length > 0
+//                     ? `<x-${trimmedPath} ${props} />`
+//                     : `<x-${trimmedPath} />`;
+
+//             return `<!-- ${capitalizeWords(
+//                 trimmedPath + " Start"
+//             )} -->\n${componentTag}\n<!-- ${capitalizeWords(
+//                 trimmedPath + " End"
+//             )} -->`;
+//         }
+//     );
+
+//     return html;
+// }
 /*** body content format method ***/
 // function updateEditorParts(html) {
 //     // Remove <body> and </body> tags
